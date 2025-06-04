@@ -29,6 +29,9 @@ def main():
         win=window
     )
 
+    maze._Maze__break_entrance_and_exit()
+
+
 
     
 
