@@ -35,6 +35,8 @@ class Cell():
         self.__window = window
         self._bg = "white"   # set to background color (white)
 
+        self.visited = False 
+
     def draw(self, x1, y1, x2, y2):
         self.__x1, self.__y1 = x1, y1
         self.__x2, self.__y2 = x2, y2

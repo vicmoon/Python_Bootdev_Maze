@@ -39,6 +39,10 @@ class Maze():
         self.__break_walls_r(0,0)
 
 
+         # *** RESET all visited flags so we can solve the maze later ***
+        self.__reset_cells_visited()
+
+
 
     def __create_cells(self):
     # build columns of rows:
@@ -74,8 +78,9 @@ class Maze():
 
 
     def _animate(self, delay=0.2):
-        self.win.redraw()
-        time.sleep(delay)
+        if self.win is not None:
+            self.win.redraw()
+            time.sleep(delay)
 
     def __break_entrance_and_exit(self):
         # Entrance : clear top wall of cells 
@@ -108,28 +113,28 @@ class Maze():
             if i > 0:
                 up = self.__cells[j][i-1] 
                 if not up.visited:
-                    neighbors.append(i-1, j, "up")
+                    neighbors.append((i-1, j, "up"))
 
             #down
 
             if i < self.num_rows -1:
                 down = self.__cells[j][i+1]
                 if not down.visited:
-                    neighbors.append(i+1, j, "down")
+                    neighbors.append((i+1, j, "down"))
 
             #left
 
             if j > 0:
                 left = self.__cells[j-1][i]
                 if not left.visited:
-                    neighbors.append(i, j-1, "left")
+                    neighbors.append((i, j-1, "left"))
 
             #right
 
             if j < self.num_cols - 1:
                 right = self.__cells[j+1][i]
                 if not right.visited:
-                    neighbors.append(i, j+1, "right")
+                    neighbors.append((i, j+1, "right"))
 
             # if no unvisited neighbors, break the loop
 
@@ -175,6 +180,12 @@ class Maze():
             #    we can optionally draw a “backtrack move” or just continue the loop.
             #    In a plain DFS, we simply loop again to see if there are more neighbors left.
             
+    
+    def __reset_cells_visited(self):
+        for col in range(self.num_cols):
+            for row in range(self.num_rows):
+                self.__cells[col][row].visited = False
+
 
 
 
