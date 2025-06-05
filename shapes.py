@@ -22,25 +22,38 @@ class Line():
 
 class Cell():
     def __init__(self, window=None):
-        self.has_left_wall = True
-        self.has_right_wall = True
-        self.has_top_wall = True
+        # Track where to draw, and automatically detect the real canvas background color
+        self.__window = window
+        if self.__window:
+            # Read the Canvas’s 'bg' option (e.g. "#000000" if black, "#ffffff" if white)
+            self._bg = self.__window.canvas["bg"]
+        else:
+            self._bg = "white"
+
+        # If the background is black, draw walls in white. Otherwise, draw walls in black.
+        self._wall_color = "white" if self._bg in ("black", "#000000") else "black"
+
+        # Initially, all four walls exist
+        self.has_left_wall   = True
+        self.has_right_wall  = True
+        self.has_top_wall    = True
         self.has_bottom_wall = True
 
+        # These store the last‐drawn pixel coordinates of this cell
         self.__x1 = -1
         self.__x2 = -1
         self.__y1 = -1
         self.__y2 = -1
 
-        self.__window = window
-        self._bg = "white"   # set to background color (white)
-
-        self.visited = False 
+        # Visited flag for carving/solving
+        self.visited = False
 
     def draw(self, x1, y1, x2, y2):
+        # Update our internal coordinates so draw_move can find centers
         self.__x1, self.__y1 = x1, y1
         self.__x2, self.__y2 = x2, y2
 
+        # Precompute endpoints for each wall segment
         wall_map = {
             'left':   ((x1, y1), (x1, y2)),
             'right':  ((x2, y1), (x2, y2)),
@@ -48,31 +61,53 @@ class Cell():
             'bottom': ((x1, y2), (x2, y2)),
         }
 
-        # always draw each edge, using bg color if wall is removed
-        # left edge
+        # 1) LEFT edge
         (sx, sy), (ex, ey) = wall_map['left']
-        color = "black" if self.has_left_wall else self._bg
+        if self.has_left_wall:
+            color = self._wall_color    # draw wall in contrasting color
+        else:
+            color = self._bg            # erase by overdrawing in background color
         if self.__window:
-            self.__window.draw_line(Line(Point(sx, sy), Point(ex, ey)), fill_color=color, width=1)
+            self.__window.draw_line(
+                Line(Point(sx, sy), Point(ex, ey)),
+                fill_color=color, width=1
+            )
 
-        # right edge
+        # 2) RIGHT edge
         (sx, sy), (ex, ey) = wall_map['right']
-        color = "black" if self.has_right_wall else self._bg
+        if self.has_right_wall:
+            color = self._wall_color
+        else:
+            color = self._bg
         if self.__window:
-            self.__window.draw_line(Line(Point(sx, sy), Point(ex, ey)), fill_color=color, width=1)
+            self.__window.draw_line(
+                Line(Point(sx, sy), Point(ex, ey)),
+                fill_color=color, width=1
+            )
 
-        # top edge
+        # 3) TOP edge
         (sx, sy), (ex, ey) = wall_map['top']
-        color = "black" if self.has_top_wall else self._bg
+        if self.has_top_wall:
+            color = self._wall_color
+        else:
+            color = self._bg
         if self.__window:
-            self.__window.draw_line(Line(Point(sx, sy), Point(ex, ey)), fill_color=color, width=1)
+            self.__window.draw_line(
+                Line(Point(sx, sy), Point(ex, ey)),
+                fill_color=color, width=1
+            )
 
-        # bottom edge
+        # 4) BOTTOM edge
         (sx, sy), (ex, ey) = wall_map['bottom']
-        color = "black" if self.has_bottom_wall else self._bg
+        if self.has_bottom_wall:
+            color = self._wall_color
+        else:
+            color = self._bg
         if self.__window:
-            self.__window.draw_line(Line(Point(sx, sy), Point(ex, ey)), fill_color=color, width=1)
-
+            self.__window.draw_line(
+                Line(Point(sx, sy), Point(ex, ey)),
+                fill_color=color, width=1
+            )
 
     def draw_move(self, to_cell, undo=False):
         # Compute this cell’s center
@@ -83,10 +118,10 @@ class Cell():
         tx = (to_cell._Cell__x1 + to_cell._Cell__x2) / 2
         ty = (to_cell._Cell__y1 + to_cell._Cell__y2) / 2
 
-        # Choose color: red for forward, gray for backtrack
+        # Red for forward, gray for backtracking
         color = "gray" if undo else "red"
 
-        if self.__window is not None:
+        if self.__window:
             self.__window.draw_line(
                 Line(Point(cx, cy), Point(tx, ty)),
                 fill_color=color,
