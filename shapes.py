@@ -74,3 +74,21 @@ class Cell():
             self.__window.draw_line(Line(Point(sx, sy), Point(ex, ey)), fill_color=color, width=1)
 
 
+    def draw_move(self, to_cell, undo=False):
+        # Compute this cell’s center
+        cx = (self.__x1 + self.__x2) / 2
+        cy = (self.__y1 + self.__y2) / 2
+
+        # Compute the target cell’s center
+        tx = (to_cell._Cell__x1 + to_cell._Cell__x2) / 2
+        ty = (to_cell._Cell__y1 + to_cell._Cell__y2) / 2
+
+        # Choose color: red for forward, gray for backtrack
+        color = "gray" if undo else "red"
+
+        if self.__window is not None:
+            self.__window.draw_line(
+                Line(Point(cx, cy), Point(tx, ty)),
+                fill_color=color,
+                width=2
+            )

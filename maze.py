@@ -32,11 +32,11 @@ class Maze():
 
         #break entrance and exit 
 
-        self.__break_entrance_and_exit()
+        # self.__break_entrance_and_exit()
 
         # start the recursive function to carve the maze 
 
-        self.__break_walls_r(0,0)
+        # self.__break_walls_r(0,0)
 
 
          # *** RESET all visited flags so we can solve the maze later ***
@@ -185,6 +185,78 @@ class Maze():
         for col in range(self.num_cols):
             for row in range(self.num_rows):
                 self.__cells[col][row].visited = False
+
+
+    def solve(self):
+        self.__reset_cells_visited()
+        return self._solve_r(0,0)
+    
+    def _solve_r(self, i, j):
+        """
+        Depth‐first search from cell (i,j). Returns True if this cell
+        leads to the goal; False if not. Draws moves and backtracks visually.
+        
+        i = row index,  j = column index
+        """
+        # 1) Animate this step (pauses briefly and redraws)
+        self._animate()
+
+        # 2) Mark this cell as visited
+        current = self.__cells[j][i]   # __cells is stored as [col][row]
+        current.visited = True
+
+        # 3) If this is the goal cell (bottom‐right), we’re done
+        if (i == self.num_rows - 1) and (j == self.num_cols - 1):
+            return True
+
+        # 4) Try each of the four directions in turn
+        # ‐ Up (i−1, j)
+        if i > 0:
+            neighbor = self.__cells[j][i - 1]
+            # Make sure there is no top‐wall blocking the move,
+            # and that neighbor hasn’t been visited yet
+            if not current.has_top_wall and not neighbor.visited:
+                # Draw a red move “forward”
+                current.draw_move(neighbor, undo=False)
+                # Recurse into that neighbor
+                if self._solve_r(i - 1, j):
+                    return True
+                # If recursion failed, draw gray “undo” move
+                neighbor.draw_move(current, undo=True)
+
+        # ‐ Down (i+1, j)
+        if i < self.num_rows - 1:
+            neighbor = self.__cells[j][i + 1]
+            if not current.has_bottom_wall and not neighbor.visited:
+                current.draw_move(neighbor, undo=False)
+                if self._solve_r(i + 1, j):
+                    return True
+                neighbor.draw_move(current, undo=True)
+
+        # ‐ Left (i, j−1)
+        if j > 0:
+            neighbor = self.__cells[j - 1][i]
+            if not current.has_left_wall and not neighbor.visited:
+                current.draw_move(neighbor, undo=False)
+                if self._solve_r(i, j - 1):
+                    return True
+                neighbor.draw_move(current, undo=True)
+
+        # ‐ Right (i, j+1)
+        if j < self.num_cols - 1:
+            neighbor = self.__cells[j + 1][i]
+            if not current.has_right_wall and not neighbor.visited:
+                current.draw_move(neighbor, undo=False)
+                if self._solve_r(i, j + 1):
+                    return True
+                neighbor.draw_move(current, undo=True)
+
+        # 5) If none of the directions worked, backtrack:
+        return False
+
+
+
+
 
 
 
