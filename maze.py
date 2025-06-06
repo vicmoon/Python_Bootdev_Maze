@@ -30,15 +30,6 @@ class Maze():
         self.__cells = []
         self.__create_cells()
 
-        #break entrance and exit 
-
-        # self.__break_entrance_and_exit()
-
-        # start the recursive function to carve the maze 
-
-        # self.__break_walls_r(0,0)
-
-
          # *** RESET all visited flags so we can solve the maze later ***
         self.__reset_cells_visited()
 
